@@ -71,6 +71,7 @@ def get_tiles(img, tile_size, n_tiles, mask, mode=0):
 def make_parse():
     parser = argparse.ArgumentParser()
     arg = parser.add_argument
+    arg("--root-path", type=str, default="../input/")
     arg("--tile-num", type=int, default=64)
     arg("--tile-size", type=int, default=192)
     arg("--res-level", type=int, default=1, help="0:High, 1:Middle, 2:Low")
@@ -88,7 +89,7 @@ def main():
     resize_size = args.resize
     mode = args.mode
 
-    root = Path("../input/")
+    root = Path(args.root_path)
     img_dir = root / "train_images"
     mask_dir = root / "train_label_masks"
     train = pd.read_csv(root / "train.csv")
@@ -105,14 +106,14 @@ def main():
         out_mask_zip, "w"
     ) as mask_out:
         for img_id in tqdm(train.image_id):
-            img_path = str(img_dir / (img_id + ".tiff"))
-            mask_path = mask_dir / (img_id + "_mask.tiff")
+            img_path = str(img_dir / (img_id + ".png"))
+            mask_path = mask_dir / (img_id + "_mask.png")
 
-            # RGB
-            image = skimage.io.MultiImage(img_path)[res_level]
+            # image saved in BGR, cv2 imread get image in RGB
+            image = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
             mask = None
             if mask_path.exists():
-                mask = skimage.io.MultiImage(str(mask_path))[res_level]
+                mask = cv2.imread(str(mask_path))  # mask saved in RGB
             tiles, masks, _ = get_tiles(
                 img=image, tile_size=tile_size, n_tiles=n_tiles, mask=mask, mode=mode
             )
@@ -128,7 +129,7 @@ def main():
 
                 # if read with PIL RGB turns into BGR
                 # We get CRC error when unzip if not cv2.imencode
-                img = cv2.imencode(".png", cv2.cvtColor(img, cv2.COLOR_RGB2BGR))[1]
+                img = cv2.imencode(".png", image)[1]
                 img_out.writestr(f"{img_id}_{idx}.png", img)
 
                 # mask[:, :, 0] has value in {0, 1, 2, 3, 4, 5}, other mask is 0 only
