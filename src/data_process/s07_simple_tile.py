@@ -98,47 +98,46 @@ def main():
         root / f"numtile-{n_tiles}-tilesize-{tile_size}-res-{res_level}-mode-{mode}"
     )
     out_dir.mkdir(exist_ok=True)
-    out_train_zip = str(out_dir / "train.zip")
-    out_mask_zip = str(out_dir / "mask.zip")
+    train_out_dir = out_dir / "train"
+    mask_out_dir = out_dir / "masks"
+    train_out_dir.mkdir(exist_ok=True)
+    mask_out_dir.mkdir(exist_ok=True)
     x_tot, x2_tot = [], []
 
-    with zipfile.ZipFile(out_train_zip, "w") as img_out, zipfile.ZipFile(
-        out_mask_zip, "w"
-    ) as mask_out:
-        for img_id in tqdm(train.image_id):
-            img_path = str(img_dir / (img_id + ".png"))
-            mask_path = mask_dir / (img_id + "_mask.png")
+    for img_id in tqdm(train.image_id):
+        img_path = str(img_dir / (img_id + ".png"))
+        mask_path = mask_dir / (img_id + "_mask.png")
 
-            # image saved in BGR, cv2 imread get image in RGB
-            image = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
-            mask = None
-            if mask_path.exists():
-                mask = cv2.imread(str(mask_path))  # mask saved in RGB
-            tiles, masks, _ = get_tiles(
-                img=image, tile_size=tile_size, n_tiles=n_tiles, mask=mask, mode=mode
-            )
+        # image saved in BGR, cv2 imread get image in RGB
+        image = cv2.imread(img_path, cv2.IMREAD_UNCHANGED)
+        mask = None
+        if mask_path.exists():
+            mask = cv2.imread(str(mask_path))  # mask saved in RGB
+        tiles, masks, _ = get_tiles(
+            img=image, tile_size=tile_size, n_tiles=n_tiles, mask=mask, mode=mode
+        )
 
-            if resize_size is not None:
-                tiles = [cv2.resize(t, (resize_size, resize_size)) for t in tiles]
-                masks = [cv2.resize(m, (resize_size, resize_size)) for m in masks]
+        if resize_size is not None:
+            tiles = [cv2.resize(t, (resize_size, resize_size)) for t in tiles]
+            masks = [cv2.resize(m, (resize_size, resize_size)) for m in masks]
 
-            for idx, img in enumerate(tiles):
-                # RGB
-                x_tot.append((img / 255.0).reshape(-1, 3).mean(0))
-                x2_tot.append(((img / 255.0) ** 2).reshape(-1, 3).mean(0))
+        for idx, img in enumerate(tiles):
+            # RGB
+            x_tot.append((img / 255.0).reshape(-1, 3).mean(0))
+            x2_tot.append(((img / 255.0) ** 2).reshape(-1, 3).mean(0))
 
-                # if read with PIL RGB turns into BGR
-                # We get CRC error when unzip if not cv2.imencode
-                # img = cv2.imencode(".png", image)[1]
-                # img_out.writestr(f"{img_id}_{idx}.png", img)
-                cv2.imwrite(f"{str(out_dir)}/train/{img_id}_{idx}.png", img)
+            # if read with PIL RGB turns into BGR
+            # We get CRC error when unzip if not cv2.imencode
+            # img = cv2.imencode(".png", image)[1]
+            # img_out.writestr(f"{img_id}_{idx}.png", img)
+            cv2.imwrite(f"{str(train_out_dir)}/{img_id}_{idx}.png", img)
 
-                # mask[:, :, 0] has value in {0, 1, 2, 3, 4, 5}, other mask is 0 only
-                if mask is not None:
-                    mask = masks[idx]
-                    cv2.imwrite(f"{str(out_dir)}/masks/{img_id}_{idx}.png", mask[:, :, 0])
-                #     mask = cv2.imencode(".png", mask[:, :, 0])[1]
-                #     mask_out.writestr(f"{img_id}_{idx}.png", mask)
+            # mask[:, :, 0] has value in {0, 1, 2, 3, 4, 5}, other mask is 0 only
+            if mask is not None:
+                mask = masks[idx]
+                cv2.imwrite(f"{str(mask_out_dir)}/{img_id}_{idx}.png", mask[:, :, 0])
+            #     mask = cv2.imencode(".png", mask[:, :, 0])[1]
+            #     mask_out.writestr(f"{img_id}_{idx}.png", mask)
 
     # image stats
     img_avr = np.array(x_tot).mean(0)
