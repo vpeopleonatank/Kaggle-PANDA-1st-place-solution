@@ -133,9 +133,9 @@ def main():
             cv2.imwrite(f"{str(train_out_dir)}/{img_id}_{idx}.png", img)
 
             # mask[:, :, 0] has value in {0, 1, 2, 3, 4, 5}, other mask is 0 only
-            if mask is not None:
-                mask = masks[idx]
-                cv2.imwrite(f"{str(mask_out_dir)}/{img_id}_{idx}.png", mask[:, :, 0])
+            # if mask is not None:
+            #     mask = masks[idx]
+            #     cv2.imwrite(f"{str(mask_out_dir)}/{img_id}_{idx}.png", mask[:, :, 0])
             #     mask = cv2.imencode(".png", mask[:, :, 0])[1]
             #     mask_out.writestr(f"{img_id}_{idx}.png", mask)
 
