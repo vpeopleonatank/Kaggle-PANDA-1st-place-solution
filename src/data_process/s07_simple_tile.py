@@ -131,11 +131,12 @@ def main():
                 # We get CRC error when unzip if not cv2.imencode
                 # img = cv2.imencode(".png", image)[1]
                 # img_out.writestr(f"{img_id}_{idx}.png", img)
-                cv2.imwrite(f"{str(out_dir)}/{img_id}_{idx}.png", img)
+                cv2.imwrite(f"{str(out_dir)}/train/{img_id}_{idx}.png", img)
 
                 # mask[:, :, 0] has value in {0, 1, 2, 3, 4, 5}, other mask is 0 only
-                # if mask is not None:
-                #     mask = masks[idx]
+                if mask is not None:
+                    mask = masks[idx]
+                    cv2.imwrite(f"{str(out_dir)}/masks/{img_id}_{idx}.png", mask[:, :, 0])
                 #     mask = cv2.imencode(".png", mask[:, :, 0])[1]
                 #     mask_out.writestr(f"{img_id}_{idx}.png", mask)
 
