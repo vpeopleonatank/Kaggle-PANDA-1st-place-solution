@@ -1,3 +1,4 @@
+import os
 import argparse
 import zipfile
 from pathlib import Path
@@ -77,6 +78,7 @@ def make_parse():
     arg("--res-level", type=int, default=1, help="0:High, 1:Middle, 2:Low")
     arg("--resize", type=int, default=None)
     arg("--mode", type=int, default=0)
+    arg("--max-files", type=int, default=150)
     return parser.parse_args()
 
 
@@ -88,6 +90,7 @@ def main():
     res_level = args.res_level
     resize_size = args.resize
     mode = args.mode
+    max_files = args.max_files
 
     root = Path(args.root_path)
     img_dir = root / "train_images"
@@ -103,8 +106,10 @@ def main():
     train_out_dir.mkdir(exist_ok=True)
     mask_out_dir.mkdir(exist_ok=True)
     x_tot, x2_tot = [], []
+    count = 0
+    out_sub_dir: Path = train_out_dir
 
-    for img_id in tqdm(train.image_id):
+    for idx, img_id in enumerate(tqdm(train.image_id)):
         img_path = str(img_dir / (img_id + ".png"))
         mask_path = mask_dir / (img_id + "_mask.png")
 
@@ -121,6 +126,11 @@ def main():
             tiles = [cv2.resize(t, (resize_size, resize_size)) for t in tiles]
             masks = [cv2.resize(m, (resize_size, resize_size)) for m in masks]
 
+        if count % (img_id - 1) == 0:
+            out_sub_dir = train_out_dir / str(count + 1)
+            out_sub_dir.mkdir(exist_ok=True)
+            count += 1
+
         for idx, img in enumerate(tiles):
             # RGB
             x_tot.append((img / 255.0).reshape(-1, 3).mean(0))
@@ -130,7 +140,7 @@ def main():
             # We get CRC error when unzip if not cv2.imencode
             # img = cv2.imencode(".png", image)[1]
             # img_out.writestr(f"{img_id}_{idx}.png", img)
-            cv2.imwrite(f"{str(train_out_dir)}/{img_id}_{idx}.png", img)
+            cv2.imwrite(f"{str(out_sub_dir)}/{img_id}_{idx}.png", img)
 
             # mask[:, :, 0] has value in {0, 1, 2, 3, 4, 5}, other mask is 0 only
             # if mask is not None:
