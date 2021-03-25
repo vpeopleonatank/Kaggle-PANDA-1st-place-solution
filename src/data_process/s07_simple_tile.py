@@ -126,7 +126,7 @@ def main():
             tiles = [cv2.resize(t, (resize_size, resize_size)) for t in tiles]
             masks = [cv2.resize(m, (resize_size, resize_size)) for m in masks]
 
-        if count % (img_id - 1) == 0:
+        if count % (idx - 1) == 0:
             out_sub_dir = train_out_dir / str(count + 1)
             out_sub_dir.mkdir(exist_ok=True)
             count += 1
