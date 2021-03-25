@@ -106,7 +106,6 @@ def main():
     train_out_dir.mkdir(exist_ok=True)
     mask_out_dir.mkdir(exist_ok=True)
     x_tot, x2_tot = [], []
-    count = 0
     out_sub_dir: Path = train_out_dir
 
     for idx, img_id in enumerate(tqdm(train.image_id)):
@@ -126,10 +125,9 @@ def main():
             tiles = [cv2.resize(t, (resize_size, resize_size)) for t in tiles]
             masks = [cv2.resize(m, (resize_size, resize_size)) for m in masks]
 
-        if count % (idx - 1) == 0:
-            out_sub_dir = train_out_dir / str(count + 1)
+        if (idx + 1) % max_files == 0:
+            out_sub_dir = train_out_dir / str(idx + 1)
             out_sub_dir.mkdir(exist_ok=True)
-            count += 1
 
         for idx, img in enumerate(tiles):
             # RGB
