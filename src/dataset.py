@@ -190,25 +190,25 @@ class TrainDataset(Dataset):
         if self.nms:
             data_dirs = [
                 # ex. numtile-64-tilesize-160-nms-striderate-8
-                f"../input/numtile-{self.num_tile}-tilesize-{self.tile_size}-nms-striderate-{sr}"
+                f"/content/drive/MyDrive/Data/PANDA_data/numtile-{self.num_tile}-tilesize-{self.tile_size}-nms-striderate-{sr}"
                 for sr in [2, 8]
             ]
         elif self.mix_nms_normal_tile:
             data_dirs = [
                 # f"../input/numtile-{self.num_tile}-tilesize-mixed-nms-normal-mode-{m}"
                 # f"../input/numtile-{self.num_tile}-tilesize-mixed-nms-normal-mode-{m}"
-                f"../input/numtile-{self.num_tile}-tilesize-{self.tile_size}-nms-striderate-{sr}"
+                f"/content/drive/MyDrive/Data/PANDA_data/numtile-{self.num_tile}-tilesize-{self.tile_size}-nms-striderate-{sr}"
                 for sr in [2, 8]
                 # for m in [0, 2]
             ]
         else:
             data_dirs = [
-                f"../input/numtile-{self.num_tile}-tilesize-{self.tile_size}-res-1-mode-{m}"
+                f"/content/drive/MyDrive/Data/PANDA_data/numtile-{self.num_tile}-tilesize-{self.tile_size}-res-1-mode-{m}"
                 for m in [0, 2]
             ]
         self.img_dir = os.path.join(data_dirs[0], "train")
         self.img_dir_mode2 = os.path.join(data_dirs[1], "train")
-        self.img_dir_gan = "../input/tile-64-size-192-res-1-forGAN"
+        self.img_dir_gan = "/content/drive/MyDrive/Data/PANDA_data/tile-64-size-192-res-1-forGAN"
         print(f"input dir: {self.img_dir}")
         if self.cycle_gan_aug:
             print(f"gan aug dir: {self.img_dir_gan}")

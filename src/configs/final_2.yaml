@@ -15,7 +15,9 @@ Data:
         # when submit kernel
         # train_df: ../input/train-5kfold_remove_noisy_by_0622_rad_13_08_ka_15_10.csv
         # Reproduce
-        train_df: ../output/model/final_1/local_preds_final_1_efficientnet-b1_removed_noise_thresh_rad_13_08_ka_15_10.csv
+        # train_df: ../output/model/final_1/local_preds_final_1_efficientnet-b1_removed_noise_thresh_rad_13_08_ka_15_10.csv
+
+        train_df: ../output/model/final_1/local_preds_final_1_efficientnet-b1_removed_noise_thresh_16.csv
         kfold: -1
         tile_option: normal
         random_tile_train: True
